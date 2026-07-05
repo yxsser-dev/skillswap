@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const apiRouter = require('./routes/api');
-const { rateLimiter, auditLogger } = require('./middleware/securityMiddleware');
+const { rateLimiter, auditLogger, GLOBAL_LIMIT, WINDOW_MS } = require('./middleware/securityMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,14 +12,13 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Global Security & Audit logging
-app.use(auditLogger);
-app.use(rateLimiter(100, 15 * 60 * 1000)); // Limits each IP to 100 requests per 15 mins
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// APIs mount
+app.use(auditLogger);
+app.use(rateLimiter(GLOBAL_LIMIT, WINDOW_MS)); 
+
 app.use('/api', apiRouter);
 
-// Base Route
 app.get('/', (req, res) => {
   res.json({ message: 'SkillSwap peer api service online' });
 });

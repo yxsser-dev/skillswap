@@ -1,13 +1,7 @@
 const db = require('../db');
 
-/**
- * Calculates match scores for a target user dynamically.
- * Reciprocity weight: +100
- * Rating weight: Avg Rating * 10
- * Overlap weight: +10 per overlapping day/time slot
- */
 async function calculateMatches(userId) {
-  // 1. Fetch target user's active listings
+  // 1. fetch target user active listings
   const targetListingsRes = await db.query(
     'SELECT * FROM listings WHERE user_id = $1 AND is_active = true',
     [userId]
@@ -21,7 +15,7 @@ async function calculateMatches(userId) {
     return [];
   }
 
-  // 2. Fetch potential match candidates (active, non-suspended, other users)
+  // 2. fetch potential match candidates (active, non-suspended, other users)
   const candidatesRes = await db.query(
     `SELECT DISTINCT u.id, u.username, u.bio, u.profile_picture_url
      FROM users u
@@ -50,7 +44,7 @@ async function calculateMatches(userId) {
     let score = 0;
     const reasons = [];
 
-    // Rule 1: Reciprocity (Mutual Swap check)
+    // Rule 1: Mutual Swap
     const canTeachCandidate = targetOfferings.some(id => candSeekings.includes(id));
     const candidateCanTeachMe = candOfferings.some(id => targetSeekings.includes(id));
 
@@ -65,7 +59,7 @@ async function calculateMatches(userId) {
       reasons.push('Seeks a skill you offer');
     }
 
-    // Rule 2: On-the-fly Ratings Check
+    // Rule 2: Ratings Check
     const ratingsRes = await db.query(
       'SELECT AVG(rating)::numeric(3,2) as avg_rating FROM reviews WHERE reviewee_id = $1',
       [candidate.id]
@@ -77,7 +71,7 @@ async function calculateMatches(userId) {
       reasons.push(`Highly rated teacher (${avgRating}★)`);
     }
 
-    // Rule 3: Availability Overlap Check
+    // Rule 3: availability Check
     let overlapCount = 0;
     for (const tListing of targetListings) {
       const tAvail = tListing.availability || { days: [], times: [] };
@@ -96,7 +90,6 @@ async function calculateMatches(userId) {
       reasons.push(`${overlapCount} overlapping day/time slot(s)`);
     }
 
-    // Append to list if a connection exists
     if (score > 0) {
       matches.push({
         candidate: {
@@ -112,7 +105,6 @@ async function calculateMatches(userId) {
     }
   }
 
-  // Sort descending by calculated score
   return matches.sort((a, b) => b.score - a.score);
 }
 

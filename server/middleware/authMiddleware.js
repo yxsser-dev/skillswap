@@ -14,7 +14,7 @@ async function authenticateToken(req, res, next) {
   try {
     const decoded = jwt.verify(token, ACCESS_SECRET);
     
-    // Check if the user is suspended
+    // Check user is suspended
     const userRes = await db.query(
       'SELECT id, username, email, role, is_suspended FROM users WHERE id = $1',
       [decoded.userId]

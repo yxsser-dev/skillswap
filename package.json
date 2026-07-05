@@ -1,13 +1,14 @@
 {
   "name": "skillswap-root",
   "version": "1.0.0",
-  "description": "SkillSwap Peer-to-Peer Marketplace",
+  "description": "SkillSwap Peer-to-peer Marketplace",
   "main": "server/index.js",
   "scripts": {
     "server": "node server/index.js",
     "client": "npm run dev --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "db:init": "node server/db/init.js"
+    "db:init": "node server/db/init.js",
+    "db:migrate:round2": "node server/db/migrate_round2.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -16,6 +17,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^1.4.5-lts.1",
     "pg": "^8.22.0",
     "zod": "^4.4.3"
   }

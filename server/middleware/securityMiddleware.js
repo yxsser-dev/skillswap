@@ -1,7 +1,6 @@
-// Simple in-memory rate limiter to prevent API abuse (Going Beyond Class Scope)
-const ipRequestCounts = {};
+function rateLimiter(limit = 100, timeframeMs = 15 * 60 * 1000) {
+  const ipRequestCounts = {};
 
-function rateLimiter(req, limit = 100, timeframeMs = 15 * 60 * 1000) {
   return (req, res, next) => {
     const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const now = Date.now();
@@ -10,13 +9,12 @@ function rateLimiter(req, limit = 100, timeframeMs = 15 * 60 * 1000) {
       ipRequestCounts[ip] = [];
     }
 
-    // Filter out requests older than the timeframe
     ipRequestCounts[ip] = ipRequestCounts[ip].filter(timestamp => now - timestamp < timeframeMs);
 
     if (ipRequestCounts[ip].length >= limit) {
       console.warn(`[SECURITY WARN] Rate limit exceeded by IP: ${ip} on path: ${req.path}`);
-      return res.status(429).json({ 
-        error: 'Too many requests from this IP address. Please try again later.' 
+      return res.status(429).json({
+        error: 'Too many requests from this IP address. Please try again later.'
       });
     }
 
@@ -25,7 +23,15 @@ function rateLimiter(req, limit = 100, timeframeMs = 15 * 60 * 1000) {
   };
 }
 
-// Meaningful System Audit Logger
+// Stricter limiter specifically for auth routes (brute-force protection)
+const isProd = process.env.NODE_ENV === 'production';
+
+const GLOBAL_LIMIT = isProd ? 100 : 2000;         // requests per window
+const AUTH_LIMIT = isProd ? 10 : 100;            // requests per window
+const WINDOW_MS = 15 * 60 * 1000;               // 15 minutes
+
+const authLimiter = rateLimiter(AUTH_LIMIT, WINDOW_MS);
+
 function auditLogger(req, res, next) {
   const start = Date.now();
   res.on('finish', () => {
@@ -38,4 +44,4 @@ function auditLogger(req, res, next) {
   next();
 }
 
-module.exports = { rateLimiter, auditLogger };
+module.exports = { rateLimiter, authLimiter, auditLogger, GLOBAL_LIMIT, WINDOW_MS };

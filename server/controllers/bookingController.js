@@ -5,7 +5,7 @@ exports.createBooking = async (req, res) => {
   const learner_id = req.user.id;
 
   try {
-    // Validate learner and teacher are distinct
+    // making sure learner and teacher are different
     if (parseInt(teacher_id) === learner_id) {
       return res.status(400).json({ error: 'You cannot swap lessons with yourself.' });
     }
@@ -47,7 +47,7 @@ exports.getUserBookings = async (req, res) => {
 
 exports.updateBookingStatus = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body; // 'accepted', 'rejected', 'completed', 'cancelled'
+  const { status } = req.body; // accepted, rejected, completed, cancelled
   const userId = req.user.id;
 
   try {
@@ -68,7 +68,6 @@ exports.updateBookingStatus = async (req, res) => {
       }
     }
 
-    // Accept / Reject Actions
     if (status === 'accepted' || status === 'rejected') {
       if (booking.teacher_id !== userId) {
         return res.status(403).json({ error: 'Only the listing host can accept/reject requests.' });
@@ -76,7 +75,7 @@ exports.updateBookingStatus = async (req, res) => {
     }
 
     const updatedRes = await db.query(
-      'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
+      'UPDATE bookings SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
       [status, id]
     );
 

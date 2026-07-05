@@ -43,7 +43,7 @@ exports.register = async (req, res) => {
 
     const result = await db.query(
       `INSERT INTO users (username, email, password_hash, bio, profile_picture_url) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, role`,
+       VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, role, bio, profile_picture_url, created_at`,
       [username, email, passwordHash, bio || '', profile_picture_url || '']
     );
 
@@ -91,7 +91,15 @@ exports.login = async (req, res) => {
     );
 
     res.json({
-      user: { id: user.id, username: user.username, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        bio: user.bio,
+        profile_picture_url: user.profile_picture_url,
+        created_at: user.created_at
+      },
       accessToken,
       refreshToken
     });
@@ -109,7 +117,7 @@ exports.refresh = async (req, res) => {
   try {
     const payload = jwt.verify(refreshToken, REFRESH_SECRET);
 
-    // Retrieve active token matching current input session
+  
     const dbTokenRes = await db.query(
       'SELECT * FROM refresh_tokens WHERE token = $1 AND user_id = $2 AND expires_at > CURRENT_TIMESTAMP',
       [refreshToken, payload.userId]
@@ -119,7 +127,7 @@ exports.refresh = async (req, res) => {
       return res.status(403).json({ error: 'Invalid or expired session token' });
     }
 
-    // Token rotation: Remove previous token
+    // Remove previous token
     await db.query('DELETE FROM refresh_tokens WHERE id = $1', [dbTokenRes.rows[0].id]);
 
     // Issue refreshed token pair

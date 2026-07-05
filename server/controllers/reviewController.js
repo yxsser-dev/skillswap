@@ -12,12 +12,12 @@ exports.createReview = async (req, res) => {
 
     const booking = bookingRes.rows[0];
 
-    // Constraint Rule: Status must be completed
+    // status must be completed
     if (booking.status !== 'completed') {
       return res.status(400).json({ error: 'Reviews can only be submitted for completed sessions.' });
     }
 
-    // Determine target reviewee
+    // Determine target reviewer
     let reviewee_id;
     if (booking.learner_id === reviewer_id) {
       reviewee_id = booking.teacher_id;
@@ -27,7 +27,6 @@ exports.createReview = async (req, res) => {
       return res.status(403).json({ error: 'You are not a registered participant of this session.' });
     }
 
-    // Insert review, handled securely by schema's UNIQUE(booking_id, reviewer_id)
     const result = await db.query(
       `INSERT INTO reviews (booking_id, reviewer_id, reviewee_id, rating, comment)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
-require('dotenv').config(); // Correctly loads variables from .env
+require('dotenv').config(); 
 
 const connectionString = process.env.DATABASE_URL;
 
