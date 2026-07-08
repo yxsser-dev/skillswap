@@ -1,40 +1,6 @@
 # SkillSwap - Peer-to-Peer Skill Exchange & Micro-Tutoring Marketplace
 
-SkillSwap is a capstone-level web application designed to connect users who want to exchange skills on a direct, mutual-benefit model. The platform features an AI-driven matching engine, a real-time scheduler, verification checks, and administrative control panels.
-
-
-⚙️ Project Setup & Installation
-Prerequisites
-Node.js (version 18+ recommended)
-PostgreSQL database engine
-1. Configure Environment Variables
-Create a .env file inside the root folder:
-code
-Env
-PORT=5000
-DATABASE_URL=postgresql://<user>:<password>@localhost:5432/skillswap
-JWT_ACCESS_SECRET=your_custom_access_secret_123
-JWT_REFRESH_SECRET=your_custom_refresh_secret_123
-2. Install Dependencies
-code
-Bash
-# Install root/backend packages
-npm install
-
-# Install client packages
-cd client
-npm install
-cd ..
-3. Initialize Database Schema
-Ensure PostgreSQL is running, then execute the migration script:
-code
-Bash
-npm run db:init
-4. Start the Application
-code
-Bash
-npm run dev
-Runs the Express server on http://localhost:5000 and the Vite React frontend on http://localhost:5173 concurrently.
+SkillSwap is a capstone-level web application designed to connect users who want to exchange skills on a direct, mutual-benefit model. The platform features an algorithmic matching engine, a real-time scheduler, verification checks, and administrative control panels.
 
 ---
 
@@ -60,7 +26,7 @@ Runs the Express server on http://localhost:5000 and the Vite React frontend on 
 * **Double Review Prevention**: Handled via database level unique constraint `UNIQUE (booking_id, reviewer_id)`.
 
 ### 3. Extra Features (Going Beyond Class Material)
-* **AI-driven Matching Algorithm**: Ranks candidates dynamically based on:
+* **Heuristic Matching Algorithm**: Ranks candidates dynamically based on:
   * **Reciprocity (Mutual Swap)**: Highest weight (+100) if User A teaches what User B wants and vice-versa.
   * **On-The-Fly Ratings**: Incorporates average feedback scores (+10 points per aggregate star rating).
   * **Availability Overlaps**: Computes schedule matches (+10 points per matching day/time slot).
@@ -78,17 +44,17 @@ The relational database is configured based on the following entity-relationship
 erDiagram
     USERS ||--o{ REFRESH_TOKENS : "has"
     USERS ||--o{ LISTINGS : "creates"
-    USERS ||--o{ BOOKINGS : "teaches/learns"
-    USERS ||--o{ REVIEWS : "writes/receives"
-    USERS ||--o{ REPORTS : "files/gets reported"
+    USERS ||--o{ BOOKINGS : "participates"
+    USERS ||--o{ REVIEWS : "receives"
+    USERS ||--o{ REPORTS : "files"
     SKILLS ||--o{ LISTINGS : "categorizes"
     LISTINGS ||--o{ BOOKINGS : "schedules"
     BOOKINGS ||--o{ REVIEWS : "generates"
 
     USERS {
         int id PK
-        string username UNIQUE
-        string email UNIQUE
+        string username
+        string email
         string password_hash
         string role
         boolean is_suspended
@@ -107,7 +73,7 @@ erDiagram
 
     SKILLS {
         int id PK
-        string name UNIQUE
+        string name
         string category
     }
 
@@ -154,7 +120,43 @@ erDiagram
         text resolution_note
         timestamp created_at
     }
+```
 
+---
 
+## ⚙️ Project Setup & Installation
 
-    
+### **Prerequisites**
+* Node.js (version 18+ recommended)
+* PostgreSQL database engine
+
+### **1. Configure Environment Variables**
+Create a `.env` file inside the root folder:
+```env
+PORT=5000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/skillswap
+JWT_ACCESS_SECRET=your_custom_access_secret_123
+JWT_REFRESH_SECRET=your_custom_refresh_secret_123
+```
+
+### **2. Install Dependencies**
+```bash
+# Install root/backend packages
+npm install
+
+# Install client packages
+cd client
+npm install
+cd ..
+```
+
+### **3. Initialize Database Schema**
+Ensure PostgreSQL is running, then execute the migration script:
+```bash
+npm run db:init
+```
+
+### **4. Start the Application**
+```bash
+npm run dev
+```
