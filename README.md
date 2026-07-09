@@ -1,10 +1,12 @@
-# SkillSwap - Peer-to-Peer Skill Exchange & Micro-Tutoring Marketplace
+# SkillSwap - Peer-to-Peer Skill Exchange & Micro Tutoring Marketplace
 
-SkillSwap is a capstone-level web application designed to connect users who want to exchange skills on a direct, mutual-benefit model. The platform features an algorithmic matching engine, a real-time scheduler, verification checks, and administrative control panels.
+SkillSwap is a capstone level web application I designed to connect users who want to exchange skills on a direct and mutual benefit model. The platform features an algorithmic matching engine, a real time scheduler, verification checks, and administrative control panels.
+
+Name: Yasir Hamid.   Id.No: 098.   Sec: B. 
 
 ---
 
-## 🚀 Technical Stack
+##  Technical Stack
 * **Backend**: Node.js / Express.js
 * **Database**: PostgreSQL (raw SQL queries using `pg` client pool)
 * **Frontend**: React (scaffolded with Vite, styled with custom Glassmorphism Vanilla CSS)
@@ -13,7 +15,7 @@ SkillSwap is a capstone-level web application designed to connect users who want
 
 ---
 
-## 🛠️ Security & Architecture Policies
+##  Security & Architecture Policies
 
 ### 1. Token Expiration & Rotation (JWT)
 * **Access Tokens**: Expire in **15 minutes**.
@@ -25,9 +27,9 @@ SkillSwap is a capstone-level web application designed to connect users who want
 * **Reviews constraints**: A user can only submit a review for bookings matching `status = 'completed'`.
 * **Double Review Prevention**: Handled via database level unique constraint `UNIQUE (booking_id, reviewer_id)`.
 
-### 3. Extra Features (Going Beyond Class Material)
+### 3. Extra Features (beyond class material)
 * **Heuristic Matching Algorithm**: Ranks candidates dynamically based on:
-  * **Reciprocity (Mutual Swap)**: Highest weight (+100) if User A teaches what User B wants and vice-versa.
+  * **Reciprocity (Mutual Swap)**: Highest weight (+100) if User A teaches what User B wants and vice versa.
   * **On-The-Fly Ratings**: Incorporates average feedback scores (+10 points per aggregate star rating).
   * **Availability Overlaps**: Computes schedule matches (+10 points per matching day/time slot).
   * **Explainability List**: Returns an array of matching reasons.
@@ -36,7 +38,7 @@ SkillSwap is a capstone-level web application designed to connect users who want
 
 ---
 
-## 💾 Database Schema (ER Diagram)
+##  Database Schema (ER Diagram)
 
 The relational database is configured based on the following entity-relationship diagram:
 
@@ -124,7 +126,13 @@ erDiagram
 
 ---
 
-## ⚙️ Project Setup & Installation
+##  The database DDL/schema:
+
+It could be found inside the repository at: server/db/schema.sql
+
+---
+
+## Project Setup & Installation:
 
 ### **Prerequisites**
 * Node.js (version 18+ recommended)
